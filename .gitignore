@@ -11,4 +11,8 @@
 /data/HD_Squeezing/epochs_labels/
 /data/NN22_Resting_State/epochs_labels/
 /data/NN22_Resting_State/Full_SynHRF_Data/
+# all files named pysnirf2.log or __pycache__ folders will be ignored:
+**/pysnirf2.log
+**/__pycache__/
+
 
