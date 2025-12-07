@@ -18,7 +18,7 @@ from cedalion.imagereco.solver import pseudo_inverse_stacked
 # DATASET CONFIGS
 #############################################################################################################
 
-path_prefix = '/home/thomas/Dokumente/Master/Master_Thesis/HD-DOT Classification/'
+path_prefix = '/home/thomas/Dokumente/Master/Master_Thesis/HD-DOT_Classification/'
 data_path_prefix = path_prefix + 'data/'
 results_path_prefix = path_prefix + 'results/'
 images_path_prefix = path_prefix + 'writing/images/'
