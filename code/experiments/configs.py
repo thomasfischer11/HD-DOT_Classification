@@ -81,23 +81,8 @@ def load_dataset_configs(data_types, alpha_sp=1e-3, load_sensitivity=False, test
 
     # Load matrices
 
-    if 'Syn_Finger_Tapping' in data_types or 'Syn_Stroop' in data_types:
-
-        # ninjanirs (resting state + synthetic)
-        #Adot_ninja_colin = cedalion.datasets.get_precomputed_sensitivity('nn22_resting', head_model='icbm152')
-        #Adot_ninja_colin = Adot_ninja_colin.assign_coords(parcel = ("vertex", parcels_icbm))
-
-        #Adot_ninja_colin_ft = Adot_ninja_colin.sel(channel=channels_syn_ft)
-        #parcel_dOD, parcel_mask_ninja_colin_ft = fwm.parcel_sensitivity(Adot_ninja_colin_ft, None, dOD_thresh, minCh, dHbO, dHbR)
-        #sensitive_parcels_ninja_colin_ft = parcel_mask_ninja_colin_ft.where(parcel_mask_ninja_colin_ft, drop=True)["parcel"].values.tolist()
-
-        #Adot_ninja_colin_stacked = fwm.compute_stacked_sensitivity(Adot_ninja_colin)
-        #B_ninja_colin = pseudo_inverse_stacked(Adot_ninja_colin_stacked, alpha = 0.01, alpha_spatial = alpha_sp)
-        #nvertices = B_ninja_colin.shape[0]//2
-        #B_ninja_colin = B_ninja_colin.assign_coords({"chromo" : ("flat_vertex", ["HbO"]*nvertices  + ["HbR"]* nvertices)})
-        #B_ninja_colin = B_ninja_colin.set_xindex("chromo")
-        #B_ninja_colin = B_ninja_colin.assign_coords({"parcel" : ("flat_vertex", np.concatenate((Adot_ninja_colin.coords['parcel'].values, Adot_ninja_colin.coords['parcel'].values)))})
-
+    if 'Syn_Finger_Tapping' in data_types:
+        '''
         if test:
             epo_label_path=lambda subject, run, int_scaling, spatial_scaling: f"epochs_labels/Finger_Tapping/test/sp_{spatial_scaling}/{subject}/int_{int_scaling}/run{run}_epochs_labels.pkl"
             #subjects=['sub-02']
@@ -122,6 +107,35 @@ def load_dataset_configs(data_types, alpha_sp=1e-3, load_sensitivity=False, test
             B=None,
             sensitive_parcels=None,
             #parcel_subset={"SomMotA": [p for p in sensitive_parcels_ninja_colin_ft if p.startswith("SomMotA")]},
+            parcel_subset=None,
+            long_channels=long_channels_dict["NN22_Resting_State"],
+            probe_area=probe_area_dict['NN22_Resting_State']['active_area']
+        )
+        '''
+
+        if test:
+            epo_label_path=lambda subject, run, int_scaling, spatial_scaling: f"epochs_labels/Finger_Tapping/test/sp_{spatial_scaling}/{subject}/int_{int_scaling}/run{run}_epochs_labels.pkl"
+            #subjects=['sub-586']
+            #subjects=['sub-586', 'sub-587']
+            subjects=['sub-568', 'sub-580', 'sub-581', 'sub-583', 'sub-586', 'sub-587', 'sub-592', 'sub-613', 'sub-618', 'sub-619', 'sub-621', 'sub-633', 'sub-638', 'sub-640']
+        else:
+            epo_label_path=lambda subject, run, int_scaling, spatial_scaling: f"epochs_labels/Finger_Tapping/new/sp_{spatial_scaling}/{subject}/int_{int_scaling}/run{run}_epochs_labels.pkl"
+            subjects=['sub-568', 'sub-580', 'sub-581', 'sub-583', 'sub-586', 'sub-587', 'sub-592', 'sub-613', 'sub-618', 'sub-619', 'sub-621', 'sub-633', 'sub-638', 'sub-640']
+        dataset_configs['Syn_Finger_Tapping'] = DataConfig(
+            synthetic=True,
+            all_subjects=['sub-568', 'sub-580', 'sub-581', 'sub-583', 'sub-586', 'sub-587', 'sub-588', 'sub-592', 'sub-613', 'sub-618', 'sub-619', 'sub-621', 'sub-633', 'sub-638', 'sub-639', 'sub-640'],
+            subjects=subjects,
+            n_runs=lambda _: 1,
+            runs=lambda _: ['1'],
+            base_path=data_path_prefix + "NN22_Resting_State/",
+            snirf_path= "Full_SynHRF_Data/Finger_Tapping/sp_{spatial_scale}/{subject}/nirs/{subject}_task-SynHRF_{run}_nirs.snirf",
+            resting_snirf_path="NN22_RS/{subject}/nirs/{subject}_task-RS_run-0{run}_nirs.snirf",
+            clean_channels_path=lambda subject, run: f"epochs_labels/clean_channels/{subject}/{run+1}/clean_channels.pkl",
+            epochs_labels_path=epo_label_path,
+            feature_slices={"Slope": slice(0, 9), "Mean": slice(3, 10), "Max": slice(2, 8), "Min": slice(2,8)},
+            Adot=None,
+            B=None,
+            sensitive_parcels=None,
             parcel_subset=None,
             long_channels=long_channels_dict["NN22_Resting_State"],
             probe_area=probe_area_dict['NN22_Resting_State']['active_area']
@@ -226,12 +240,14 @@ def load_dataset_configs(data_types, alpha_sp=1e-3, load_sensitivity=False, test
 
         dataset_configs['BS_Laura'] = DataConfig(
             synthetic=False,
-            all_subjects=['sub-547','sub-568', 'sub-577', 'sub-580', 'sub-581', 'sub-583', 'sub-586', 'sub-587', 'sub-588', 'sub-592', 'sub-613', 'sub-618', 'sub-619', 'sub-621', 'sub-633', 'sub-638', 'sub-640'],
+            all_subjects=['sub-568', 'sub-577', 'sub-580', 'sub-581', 'sub-583', 'sub-586', 'sub-587', 'sub-588', 'sub-592', 'sub-613', 'sub-618', 'sub-619', 'sub-621', 'sub-633', 'sub-638', 'sub-639', 'sub-640'],
             subjects=subjects,
             n_runs=lambda _: 3,
             runs=lambda _: ['1', '2', '3'],
+            #runs=lambda _: ['1'],
             base_path=data_path_prefix + "BS_Laura/",
             snirf_path="BS_Laura_Data/{subject}/nirs/{subject}_task-BS_run-0{run}_nirs.snirf",
+            #snirf_path="BS_Laura_Data/{subject}/nirs/{subject}_task-RS_run-0{run}_nirs.snirf",
             stim_template = "BS_Laura_Data/{subject}/nirs/{subject}_task-BS_run-0{run}_events.tsv",
             clean_channels_path=lambda subject, run: f"epochs_labels/clean_channels/{subject}/{run+1}/clean_channels.pkl",
             epochs_labels_path=epo_label_path,
